@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Alita AI Subscription</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<h2>Choose Your Plan</h2>
+
+<button onclick="pay('monthly')">Monthly – ₹1,800</button>
+<button onclick="pay('yearly')">Yearly – ₹18,000</button>
+
+<script>
+async function pay(plan) {
+  const res = await fetch("/create-order", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ plan })
+  });
+
+  const data = await res.json();
+
+  const options = {
+    key: data.key,
+    amount: data.amount,
+    currency: "INR",
+    name: "Alita AI",
+    description: plan + " subscription",
+    order_id: data.order_id,
+    handler: function () {
+      // Redirect ONLY (access unlock happens server-side)
+      window.location.href = "https://t.me/Ask_Alita_bot?start=paid";
+    }
+  };
+
+  new Razorpay(options).open();
+}
+</script>
+
+</body>
+</html>
